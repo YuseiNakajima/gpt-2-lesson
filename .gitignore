@@ -7,3 +7,4 @@
 *learning_detail_latest.txt
 *latest_checkpoint.bin
 *best_checkpoint.bin
+*.DS_Store
