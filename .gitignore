@@ -4,3 +4,6 @@
 *train.bin
 *val.bin
 *__pycache__
+*learning_detail_latest.txt
+*latest_checkpoint.bin
+*best_checkpoint.bin

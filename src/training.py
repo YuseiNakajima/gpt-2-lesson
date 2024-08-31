@@ -17,13 +17,15 @@ def train(model, optimizer, scaler, tokenizer, device, config):
         device: 使用するデバイス
         config: 設定パラメータを含む辞書
     """
-    best_loss = 1e9
+    best_loss = float('inf')
     scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=lambda cur_iter: get_lr(cur_iter, config))
 
     for cur_iter in tqdm(range(config['begin'], config['max_iters'])):
+        scheduler.step()
+
         for _ in range(config['batch_iteration']):
             optimizer.zero_grad()
-            with torch.cuda.amp.autocast(enabled=True):
+            with torch.cuda.amp.autocast(enabled=(device.type == "cuda")):
                 x, y = get_batch("train", config['sentence_size'], config['batch_size'], device)
                 padding_mask, mask = model.create_mask(x, 0, device)
                 loss, pred = model(x, y, padding_mask, mask)
@@ -66,13 +68,13 @@ def validate(model, device, config):
     valid_loss = 0
     for _ in range(config['val_iteration']):
         with torch.no_grad():
-            with torch.amp.autocast(device_type=device, enabled=(device == "cuda")):
+            with torch.cuda.amp.autocast(enabled=(device.type == "cuda")):
                 x, y = get_batch("val", config['sentence_size'], config['batch_size'], device)
                 padding_mask, mask = model.create_mask(x, 0, device)
                 loss, pred = model(x, y, padding_mask, mask)
-                valid_loss += loss.detach()
+                valid_loss += loss.item()
         del x, y, padding_mask, mask, loss, pred
-    return valid_loss.item() / config['val_iteration']
+    return valid_loss / config['val_iteration']
 
 def save_checkpoint(model, optimizer, scaler, cur_iter, best_loss, filename, loss=None):
     """

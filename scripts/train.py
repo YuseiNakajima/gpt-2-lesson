@@ -1,12 +1,17 @@
-import torch
-from src.model import GPT
-from src.data_processing import load_and_process_dataset, save_processed_dataset, create_memmap_files, get_batch
-from src.training import train
-import tiktoken
-
 import sys
-sys.path.append('/path/to/your/src')
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+import torch
+import tiktoken
 from src.model import GPT
+from src.training import train
+from src.data_processing import (
+    load_and_process_dataset,
+    save_processed_dataset,
+    create_memmap_files,
+    get_batch,
+)
 
 def main():
     # 設定
@@ -27,10 +32,10 @@ def main():
     }
 
     # デバイスの設定
-    device = "cuda" if torch.cuda.is_available() else "cpu"
+    device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
 
     # データの準備
-    tokenized, tokenizer = load_and_process_dataset()
+    tokenized, tokenizer = load_and_process_dataset(trust_remote_code=True)
     save_processed_dataset(tokenized)
     create_memmap_files(tokenized)
 
@@ -40,7 +45,7 @@ def main():
 
     # オプティマイザとスケーラーの設定
     optimizer = torch.optim.Adam(model.parameters(), lr=config['max_lr'])
-    scaler = torch.amp.GradScaler(enabled=(device == "cuda"))
+    scaler = torch.cuda.amp.GradScaler(enabled=(device.type == "cuda"))
 
     # 学習の実行
     train(model, optimizer, scaler, tokenizer, device, config)

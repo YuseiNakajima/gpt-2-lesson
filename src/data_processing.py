@@ -4,7 +4,7 @@ from datasets import load_dataset
 import tiktoken
 import pickle
 
-def load_and_process_dataset(num_proc_load_dataset=8):
+def load_and_process_dataset(trust_remote_code=8):
     """
     OpenWebTextデータセットをロードし、前処理を行う関数。
 
@@ -14,8 +14,9 @@ def load_and_process_dataset(num_proc_load_dataset=8):
     戻り値:
         処理済みのデータセット
     """
+    num_proc_load_dataset = 8
     # データセットのロード
-    dataset = load_dataset("openwebtext", num_proc=num_proc_load_dataset)
+    dataset = load_dataset("openwebtext", num_proc=num_proc_load_dataset, trust_remote_code=trust_remote_code)
     
     # データセットの分割
     split_dataset = dataset["train"].train_test_split(test_size=0.0005, seed=2357, shuffle=True)

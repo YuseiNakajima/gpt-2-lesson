@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  llm:
+    build: .
+    volumes:
+      - ./train.bin:/app/train.bin
+      - ./val.bin:/app/val.bin
+      - .:/app
+    environment:
+      - PYTHONPATH=/app
+      - PYTHONUNBUFFERED=1
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]

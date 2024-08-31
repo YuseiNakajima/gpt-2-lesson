@@ -93,7 +93,7 @@ class GPT(nn.Module):
     """
 
     def __init__(self, vocab_size, embedding_dim, ffn_dim, num_heads, drop_out_rate=0.,
-                 layer_eps=1e-05, batch_first=False, T=10000, N=1):
+                layer_eps=1e-05, batch_first=False, T=10000, N=1):
         super().__init__()
         
         # トークン埋め込み層
@@ -105,7 +105,7 @@ class GPT(nn.Module):
         # デコーダ層のリスト
         self.decoder = nn.ModuleList([
             PreLNGPTDecoderLayer(embedding_dim, ffn_dim, num_heads, drop_out_rate,
-                                 layer_eps, batch_first) for _ in range(N)
+                                layer_eps, batch_first) for _ in range(N)
         ])
         
         # 出力層（語彙サイズに変換）
