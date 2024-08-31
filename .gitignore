@@ -1,0 +1,6 @@
+*create_llm_project_summary.txt
+*gen.py
+*tokenized_dataset.bin
+*train.bin
+*val.bin
+*__pycache__
