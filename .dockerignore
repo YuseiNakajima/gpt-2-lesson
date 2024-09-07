@@ -21,3 +21,12 @@ coverage.xml
 .mypy_cache
 .pytest_cache
 .hypothesis
+*create_llm_project_summary.txt
+*gen.py
+*tokenized_dataset.bin
+*train.bin
+*val.bin
+*__pycache__
+*learning_detail_latest.txt
+*latest_checkpoint.bin
+*best_checkpoint.bin

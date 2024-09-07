@@ -13,6 +13,7 @@ from src.data_processing import (
     get_batch,
 )
 
+
 def main():
     # 設定
     config = {
@@ -29,19 +30,26 @@ def main():
         'val_iteration': 1,
         'vocab_size': 50257,
         'begin': 0,
+        'drop_out_rate': 0.1,  # ドロップアウト率を追加
     }
 
     # デバイスの設定
-    device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     # データの準備
-    tokenized, tokenizer = load_and_process_dataset(trust_remote_code=True)
+    tokenized, tokenizer = load_and_process_dataset()
     save_processed_dataset(tokenized)
     create_memmap_files(tokenized)
 
     # モデルの初期化
-    model = GPT(config['vocab_size'], config['embedding_size'], config['embedding_size']*4, 
-                config['num_heads'], 0, batch_first=True, T=config['sentence_size'], N=config['depth']).to(device)
+    model = GPT(config['vocab_size'], 
+                config['embedding_size'], 
+                config['embedding_size']*4, 
+                config['num_heads'], 
+                config['drop_out_rate'],
+                batch_first=True, 
+                T=config['sentence_size'], 
+                N=config['depth']).to(device)
 
     # オプティマイザとスケーラーの設定
     optimizer = torch.optim.Adam(model.parameters(), lr=config['max_lr'])

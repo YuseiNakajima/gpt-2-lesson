@@ -21,8 +21,6 @@ def train(model, optimizer, scaler, tokenizer, device, config):
     scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=lambda cur_iter: get_lr(cur_iter, config))
 
     for cur_iter in tqdm(range(config['begin'], config['max_iters'])):
-        scheduler.step()
-
         for _ in range(config['batch_iteration']):
             optimizer.zero_grad()
             with torch.cuda.amp.autocast(enabled=(device.type == "cuda")):
@@ -33,6 +31,8 @@ def train(model, optimizer, scaler, tokenizer, device, config):
             scaler.step(optimizer)
             scaler.update()
             del x, y, padding_mask, mask, loss, pred
+
+        scheduler.step()
 
         valid_loss = validate(model, device, config)
 
